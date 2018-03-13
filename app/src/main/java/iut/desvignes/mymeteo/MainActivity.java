@@ -1,5 +1,6 @@
 package iut.desvignes.mymeteo;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -24,8 +25,13 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         appBar = findViewById(R.id.appbar);
         setSupportActionBar(appBar);
 
-        //Lien Vue-Presenter
-        presenter = new MeteoPresenter();
+        //Lien Vue-Presenter + gestion du cycle de vie
+        if (getLastCustomNonConfigurationInstance() != null)
+            presenter = (MeteoPresenter) getLastCustomNonConfigurationInstance();
+        else if (savedInstanceState != null)
+            presenter = (MeteoPresenter) savedInstanceState.getSerializable("presenter");
+        else
+            presenter = new MeteoPresenter();
         presenter.setView(this);
     }
 
@@ -41,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         switch(item.getItemId()){
             case R.id.action_refresh :
                 presenter.onRefresh();
+                startActivity(new Intent(this, MapsActivity.class));
                 return true;
             case R.id.action_settings :
                 presenter.onSettings();
@@ -48,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         }
         return super.onOptionsItemSelected(item);
     }
-    //Méthodes de l'interface Vue
+
+    //------ Méthodes de l'interface Vue -------//
     @Override
     public void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
@@ -62,5 +70,18 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     @Override
     public void notifyItemDeleted(int index) {
 
+    }
+
+    //---------- Cycle de vie --------//
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return presenter;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (! isChangingConfigurations())
+            outState.putSerializable("presenter", presenter);
     }
 }

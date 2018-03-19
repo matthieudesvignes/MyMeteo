@@ -3,23 +3,31 @@ package iut.desvignes.mymeteo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class MainActivity extends AppCompatActivity implements MeteoView{
 
     //Initialisation des vues de l'activité
     private Toolbar appBar;
-
-    MeteoPresenter presenter;
+    private RecyclerView recyclerView;
+    private ExecutorService pool;
+    private MeteoPresenter presenter;
+    private MeteoAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pool = Executors.newSingleThreadExecutor();
 
         //Affectation des vues de l'activité
         appBar = findViewById(R.id.appbar);
@@ -33,6 +41,23 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         else
             presenter = new MeteoPresenter();
         presenter.setView(this);
+
+        //Lien avec la BD
+        MeteoDatabase db = MeteoDatabase.getInstance(this);
+        presenter.setMeteoDao(db.getMeteoDao());
+
+        // gestion du recycler View
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
+        // gestion adapter + repository
+        adapter = new MeteoAdapter(pool, presenter);
+        presenter.getTownsList().observe(this, towns -> {
+                    adapter.submitList(towns)
+                  ;}
+        );
+        recyclerView.setAdapter(adapter);
+        presenter.setRepository(new Repository());
     }
 
     //------ Méthode pour le menu appBar -------//
@@ -46,11 +71,11 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_refresh :
-                presenter.onRefresh();
+                pool.submit(() -> presenter.onRefresh());
                 startActivity(new Intent(this, MapsActivity.class));
                 return true;
             case R.id.action_settings :
-                presenter.onSettings();
+                pool.submit(() -> presenter.onSettings());
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -83,5 +108,11 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         super.onSaveInstanceState(outState);
         if (! isChangingConfigurations())
             outState.putSerializable("presenter", presenter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        pool.shutdown();
+        super.onDestroy();
     }
 }

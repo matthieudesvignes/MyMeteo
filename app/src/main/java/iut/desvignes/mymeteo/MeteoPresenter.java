@@ -17,7 +17,7 @@ public class MeteoPresenter implements Serializable{
     private transient LiveData<PagedList<MeteoModel>> townsList;
     private transient MeteoDao meteoDao;
 
-    private MeteoModel lastDeletedTown;
+    //private MeteoModel lastDeletedTown;
 
     public void setMeteoDao(MeteoDao meteoDao){
         this.meteoDao = meteoDao;
@@ -25,13 +25,20 @@ public class MeteoPresenter implements Serializable{
     }
 
     public void insertTestTown(){
+        //meteoDao.deleteAll(meteoDao.getAllTownsList());
         MeteoModel town = new MeteoModel();
         //Test avec Londres
-        town.setId(2643743);
-        town.setTemperature(77.77);
-        town.setTownName("Londres");
+        town.setId(3);
+        town.setTemperature(45);
+        town.setTownName("berlin");
         town.setIconID("09d");
-        projectDao.insert(town);
+        MeteoModel town2 = new MeteoModel();
+        //Test avec Londres
+        town2.setId(2);
+        town2.setTemperature(42.42);
+        town2.setTownName("Moscou");
+        town2.setIconID("09d");
+        meteoDao.insert(town, town2);
     }
 
     public void setView(MeteoView view){
@@ -53,6 +60,8 @@ public class MeteoPresenter implements Serializable{
 
     public void onRefresh() {
         view.showMessage("onRefresh");
+        MeteoModel town = repository.getTownByID(2643743);
+        meteoDao.insert(town);
     }
 
     public int getImageID(){

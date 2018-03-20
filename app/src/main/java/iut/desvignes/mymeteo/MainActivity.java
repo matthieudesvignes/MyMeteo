@@ -1,6 +1,8 @@
 package iut.desvignes.mymeteo;
 
 import android.content.Intent;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,6 +25,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     private MeteoPresenter presenter;
     private MeteoAdapter adapter;
 
+    private FloatingActionButton floatingActionButton;
+    private CoordinatorLayout meteoCoordinator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +37,12 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         //Affectation des vues de l'activité
         appBar = findViewById(R.id.appbar);
         setSupportActionBar(appBar);
+        meteoCoordinator = findViewById(R.id.meteoCoordinator);
+        floatingActionButton = findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(view ->{
+            pool.submit(() ->
+                    presenter.onRefresh());
+        });
 
         //Lien Vue-Presenter + gestion du cycle de vie
         if (getLastCustomNonConfigurationInstance() != null)
@@ -52,10 +63,13 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
 
         // gestion adapter + repository
         adapter = new MeteoAdapter(pool, presenter);
+
+
         presenter.getTownsList().observe(this, towns -> {
-                    adapter.submitList(towns)
-                  ;}
-        );
+                                                                adapter.submitList(towns);
+                                                            });
+
+
         recyclerView.setAdapter(adapter);
         presenter.setRepository(new Repository());
     }
@@ -72,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         switch(item.getItemId()){
             case R.id.action_refresh :
                 pool.submit(() -> presenter.onRefresh());
-                startActivity(new Intent(this, MapsActivity.class));
+                //startActivity(new Intent(this, MapsActivity.class)); TODO
                 return true;
             case R.id.action_settings :
                 pool.submit(() -> presenter.onSettings());

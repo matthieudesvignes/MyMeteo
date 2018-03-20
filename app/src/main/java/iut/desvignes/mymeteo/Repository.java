@@ -1,7 +1,6 @@
 package iut.desvignes.mymeteo;
 
 import java.io.IOException;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -24,10 +23,10 @@ public class Repository {
         service = retrofit.create(OpenWeatherService.class);
 }
 
-    public List<MeteoModel> getTowns(int cityId, String apiKey) {
+    public MeteoModel getTownByID(int cityId) {
         try {
-            Call<List<MeteoModel>> call = service.getProjects(cityId, apiKey);
-            Response<List<MeteoModel>> response = call.execute();
+            Call<MeteoModel> call = service.getTownById(cityId);
+            Response<MeteoModel> response = call.execute();
             return response.body();
         } catch (IOException e) {
             return null;

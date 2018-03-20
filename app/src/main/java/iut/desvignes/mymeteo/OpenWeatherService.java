@@ -11,6 +11,6 @@ import retrofit2.http.Query;
  */
 
 public interface OpenWeatherService {
-    @GET("forecast")
-        Call<List<MeteoModel>> getProjects(@Query("id") int cityId, @Query("APPID") String apiKey);
+    @GET("weather?APPID=7d4cb01ae28e955cb88aca49a5432d95")
+        Call<MeteoModel> getTownById(@Query("id") int cityId);
 }

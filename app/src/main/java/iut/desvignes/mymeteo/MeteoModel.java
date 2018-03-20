@@ -51,10 +51,7 @@ public class MeteoModel implements Serializable {
 
         MeteoModel that = (MeteoModel) o;
 
-        if (temperature != that.temperature) return false;
-        if (!townName.equals(that.townName)) return false;
-        return iconID.equals(that.iconID);
+        return id == that.id;
     }
-
 
 }

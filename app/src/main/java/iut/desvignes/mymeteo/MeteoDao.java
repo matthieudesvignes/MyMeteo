@@ -1,6 +1,8 @@
 package iut.desvignes.mymeteo;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.paging.DataSource;
+import android.arch.paging.PagedList;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -19,6 +21,9 @@ public interface MeteoDao {
     @Query("SELECT * FROM town_table")
     DataSource.Factory<Integer, MeteoModel> getAllTowns();
 
+    @Query("SELECT * FROM town_table")
+    List<MeteoModel> getAllTownsList();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(MeteoModel... towns);
 
@@ -29,7 +34,7 @@ public interface MeteoDao {
     MeteoModel getFirstTown();
 
     @Delete
-    void delete(MeteoModel... towns);
+    void deleteAll(List<MeteoModel> towns);
 
     @Delete
     void deleteSelectedTown(MeteoModel town);

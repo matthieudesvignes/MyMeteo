@@ -15,13 +15,13 @@ import java.util.concurrent.ExecutorService;
  * Created by androidS4 on 19/03/18.
  */
 
-public class MeteoAdapter extends PagedListAdapter<MeteoModel, MeteoAdapter.TownViewHolder>{
+public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownViewHolder>{
 
-    static DiffUtil.ItemCallback<MeteoModel> diffCallback = new DiffUtil.ItemCallback<MeteoModel>() {
-        @Override public boolean areItemsTheSame(MeteoModel oldItem, MeteoModel newItem) {
+    static DiffUtil.ItemCallback<MeteoRoom> diffCallback = new DiffUtil.ItemCallback<MeteoRoom>() {
+        @Override public boolean areItemsTheSame(MeteoRoom oldItem, MeteoRoom newItem) {
             return oldItem.getId() == newItem.getId();
         }
-        @Override public boolean areContentsTheSame(MeteoModel oldItem, MeteoModel newItem) {
+        @Override public boolean areContentsTheSame(MeteoRoom oldItem, MeteoRoom newItem) {
             return oldItem.equals(newItem);
         }
     };
@@ -44,7 +44,7 @@ public class MeteoAdapter extends PagedListAdapter<MeteoModel, MeteoAdapter.Town
 
     @Override
     public void onBindViewHolder(TownViewHolder holder, int position) {
-        MeteoModel town = this.getItem(position);
+        MeteoRoom town = this.getItem(position);
         if(town != null) holder.displayTown(town);
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ public class MeteoAdapter extends PagedListAdapter<MeteoModel, MeteoAdapter.Town
             imageView = itemView.findViewById(R.id.imageView);
         }
 
-        public void displayTown(MeteoModel town) {
+        public void displayTown(MeteoRoom town) {
             nameView.setText(town.getTownName());
             tempView.setText(Double.toString(town.getTemperature()));
             imageView.setImageResource(presenter.getImageID());

@@ -23,9 +23,9 @@ public class Repository {
         service = retrofit.create(OpenWeatherService.class);
 }
 
-    public MeteoModel getTownByID(int cityId) {
+    public MeteoModel getTownByName(String townName) {
         try {
-            Call<MeteoModel> call = service.getTownById(cityId);
+            Call<MeteoModel> call = service.getTownByName(townName);
             Response<MeteoModel> response = call.execute();
             return response.body();
         } catch (IOException e) {

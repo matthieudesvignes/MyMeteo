@@ -8,50 +8,40 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by androidS4 on 13/03/18.
  */
-@Entity(tableName = "town_table")
+
 public class MeteoModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @PrimaryKey()
-    private int id;
 
-    @SerializedName("name") private String townName;
-    @SerializedName("main.temp") private double temperature;
-    @SerializedName("weather.icon") private String iconID; // ensoleillé, pluvieux etc à voir en fonction de l'API
+     String name;
+     int id;
+     Main main;
+     Weather weather;
+     Coord coord;
 
 
-    public String getTownName() {
-        return townName;
-    }
-    public void setTownName(String townName) {
-        this.townName = townName;
+    static class Main{
+        Double temp;
     }
 
-    public double getTemperature() {
-        return temperature;
-    }
-    public void setTemperature(double temperature) {
-        this.temperature = temperature;
+    static class Weather{
+        String icon;
     }
 
-    public String getIconID() {
-        return iconID;
+    static class Coord{
+        Double lon;
+        Double lat;
     }
-    public void setIconID(String weather) {
-        this.iconID = weather;
-    }
+
+    public String getName() { return name; }
 
     public int getId(){ return this.id; }
-    public void setId(int id) { this.id = id; }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public Double getTemp(){ return this.main.temp;}
 
-        MeteoModel that = (MeteoModel) o;
+    public Double getLat(){ return this.coord.lat;}
 
-        return id == that.id;
-    }
+    public Double getLon(){ return this.coord.lon;}
 
+    public String getIcon(){ return this.weather.icon;}
 }

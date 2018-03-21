@@ -5,4 +5,5 @@
     <string name="title_activity_maps">MyMeteo</string>
     <string name="action_addItem">add item</string>
     <string name="action_deleteMarker">deleteMarker</string>
+    <string name="action_secondaryMenu">Secondary menu</string>
 </resources>

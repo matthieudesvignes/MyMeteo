@@ -14,58 +14,73 @@ public class MeteoPresenter implements Serializable{
 
     private transient MeteoView view;
     private transient Repository repository;
-    private transient LiveData<PagedList<MeteoModel>> townsList;
+    private transient LiveData<PagedList<MeteoRoom>> townsList;
     private transient MeteoDao meteoDao;
 
-    //private MeteoModel lastDeletedTown;
 
     public void setMeteoDao(MeteoDao meteoDao){
         this.meteoDao = meteoDao;
         this.townsList = new LivePagedListBuilder<>(meteoDao.getAllTowns(), 30).build();
     }
 
-    public void insertTestTown(){
-        //meteoDao.deleteAll(meteoDao.getAllTownsList());
-        MeteoModel town = new MeteoModel();
-        //Test avec Londres
-        town.setId(3);
-        town.setTemperature(45);
-        town.setTownName("berlin");
-        town.setIconID("09d");
-        MeteoModel town2 = new MeteoModel();
-        //Test avec Londres
-        town2.setId(2);
-        town2.setTemperature(42.42);
-        town2.setTownName("Moscou");
-        town2.setIconID("09d");
-        meteoDao.insert(town, town2);
-    }
-
     public void setView(MeteoView view){
         this.view = view;
-    }
-
-    public LiveData<PagedList<MeteoModel>> getTownsList(){
-        return townsList;
     }
 
     public void setRepository(Repository repository) {
         this.repository = repository;
     }
 
+    public LiveData<PagedList<MeteoRoom>> getTownsList(){
+        return townsList;
+    }
+
+    // ------------- Méthode bouton du menu --------------- //
+
+
     public void onSettings() {
         view.showMessage("onSettings");
-        insertTestTown();
+        //insertTestTown();
     }
 
     public void onRefresh() {
         view.showMessage("onRefresh");
-        MeteoModel town = repository.getTownByID(2643743);
+       // MeteoModel town = repository.getTownByName("London");
+        //meteoDao.insert(town);
+    }
+
+    // Méthode invoqué par le dialogue
+    public void addTown(String townName){
+        MeteoModel townRetrofit = repository.getTownByName(townName);
+        MeteoRoom town= new MeteoRoom();
+        town.setIconID(townRetrofit.getIcon());
+        town.setId(townRetrofit.getId());
+        town.setLat(townRetrofit.getLat());
+        town.setLng(townRetrofit.getLon());
+        town.setTemperature(townRetrofit.getTemp());
+        town.setTownName(townRetrofit.getName());
         meteoDao.insert(town);
     }
 
+
     public int getImageID(){
         //todo
-        return R.drawable.defibrillator;
+        return R.drawable.icon_01d;
     }
+       /*public void insertTestTown(){
+            //meteoDao.deleteAll(meteoDao.getAllTownsList());
+            MeteoModel town = new MeteoModel();
+            //Test avec Londres
+            town.setId(3);
+            town.setTemperature(45);
+            town.setTownName("berlin");
+            town.setIconID("09d");
+            MeteoModel town2 = new MeteoModel();
+            //Test avec Londres
+            town2.setId(2);
+            town2.setTemperature(42.42);
+            town2.setTownName("Moscou");
+            town2.setIconID("09d");
+            meteoDao.insert(town, town2);
+        }*/
 }

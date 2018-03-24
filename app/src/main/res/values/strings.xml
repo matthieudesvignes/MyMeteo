@@ -6,4 +6,6 @@
     <string name="action_addItem">add item</string>
     <string name="action_deleteMarker">deleteMarker</string>
     <string name="action_secondaryMenu">Secondary menu</string>
+    <string name="item_deleted">A city has been deleted</string>
+    <string name="undo">UNDO</string>
 </resources>

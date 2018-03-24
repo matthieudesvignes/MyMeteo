@@ -4,12 +4,15 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.concurrent.ExecutorService;
@@ -42,9 +45,7 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         // on click du bouton flottant
         floatingActionButton.setOnClickListener(view ->{
             presenter.onFlottingButton();
-            pool.submit(() ->
-                    presenter.accessApiTest());
-        });
+            pool.submit(() -> presenter.insertTestTown()); });
 
         //Lien Vue-Presenter + gestion du cycle de vie
         if (getLastCustomNonConfigurationInstance() != null)
@@ -114,16 +115,22 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     }
 
 
-    // --------- Méthode Adapter
-    @Override
-    public void notifyItemInserted(int index) {
+    // --------- Méthode Adapter ----------------- //
 
-    }
+
 
     @Override
-    public void notifyItemDeleted(int index) {
+    public void notifyItemDeleted() {
 
+        Snackbar.make(meteoCoordinator, R.string.item_deleted, Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        pool.submit(() -> presenter.undo());
+                    }
+                }).show();
     }
+
 
     //---------- Cycle de vie --------//
     @Override
@@ -148,6 +155,4 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     private boolean isUiThread(){
         return Looper.myLooper() == Looper.getMainLooper();
     }
-
-
 }

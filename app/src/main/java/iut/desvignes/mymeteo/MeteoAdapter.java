@@ -48,7 +48,7 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
         if(town != null) holder.displayTown(town);
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class TownViewHolder extends RecyclerView.ViewHolder {
+    public class TownViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
         private TextView nameView, tempView;
         private ImageView imageView;
 
@@ -57,6 +57,7 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
             nameView = itemView.findViewById(R.id.itemTownNameView);
             tempView = itemView.findViewById(R.id.textViewTemp);
             imageView = itemView.findViewById(R.id.imageView);
+            itemView.setOnLongClickListener(this);
         }
 
         public void displayTown(MeteoRoom town) {
@@ -64,5 +65,11 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
             tempView.setText(Double.toString(town.getTemperature()));
             imageView.setImageResource(presenter.getImageID());
         }
+
+    @Override
+    public boolean onLongClick(View v) {
+        service.submit(() -> presenter.delete(MeteoAdapter.this.getItem(getAdapterPosition())));
+        return true;
     }
+}
 }

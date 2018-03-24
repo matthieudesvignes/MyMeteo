@@ -24,6 +24,10 @@ public interface MeteoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(MeteoRoom... towns);
 
+    @Delete
+    void deleteSelectedTown(MeteoRoom town);
+
+///////////////////////////////////////////////////////////////////////////////
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertList(List<MeteoRoom> towns);
 
@@ -32,9 +36,6 @@ public interface MeteoDao {
 
     @Delete
     void deleteAll(List<MeteoRoom> towns);
-
-    @Delete
-    void deleteSelectedTown(MeteoRoom town);
 
     @Update
     void update(MeteoRoom... towns);

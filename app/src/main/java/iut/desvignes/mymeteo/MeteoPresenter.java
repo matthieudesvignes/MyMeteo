@@ -19,6 +19,10 @@ public class MeteoPresenter implements Serializable{
     private transient LiveData<PagedList<MeteoRoom>> townsList;
     private transient MeteoDao meteoDao;
 
+    MeteoRoom lastTownDeleted;
+
+    private int townCount = 5; // Pour le test du dialogue, à supprimer
+    // Lien entre les classes
 
     public void setMeteoDao(MeteoDao meteoDao){
         this.meteoDao = meteoDao;
@@ -40,23 +44,38 @@ public class MeteoPresenter implements Serializable{
     // ------------- Méthode bouton du menu --------------- //
 
 
-    public void onSettings() {
-        view.showMessage("onSettings");
-        //insertTestTown();
-    }
+    public void onSettings() { view.showMessage("onSettings"); }
 
     public void onFlottingButton() {
         view.showMessage("onFloattingButton");
     }
 
-    public void onRefresh() {
-        view.showMessage("onRefresh");
-       // MeteoModel town = repository.getTownByName("London");
-        //meteoDao.insert(town);
+    public void onRefresh() { view.showMessage("onRefresh"); }
+
+    // Méthode de gestion de la BD
+
+    public void undo() {
+        meteoDao.insert(lastTownDeleted);
+    }
+
+    public void delete(MeteoRoom town) {
+        lastTownDeleted = town;
+        meteoDao.deleteSelectedTown(town);
+        view.notifyItemDeleted();
     }
 
     public void refreshData() {
     }
+
+    public int getImageID(){
+        //todo
+        return R.drawable.icon_01d;
+    }
+
+
+    /////////////////////////////////////////////////////
+    //////////////// Méthode tests //////////////////////
+    /////////////////////////////////////////////////////
 
     // Méthode invoqué par le dialogue
     public void addTown(String townName){
@@ -71,26 +90,47 @@ public class MeteoPresenter implements Serializable{
         meteoDao.insert(town);
     }
 
-    public int getImageID(){
-        //todo
-        return R.drawable.icon_01d;
+    public void addByDialog(){
+        MeteoRoom town = new MeteoRoom();
+        town.setId(townCount);
+        town.setTemperature(3.14);
+        town.setTownName("Dialog");
+        town.setIconID("09d");
+        meteoDao.insert(town);
+        townCount ++ ;
     }
 
        public void insertTestTown(){
-            //meteoDao.deleteAll(meteoDao.getAllTownsList());
+            //Test 1
             MeteoRoom town = new MeteoRoom();
-            //Test avec Londres
-            town.setId(3);
+            town.setId(1);
             town.setTemperature(45);
             town.setTownName("berlin");
             town.setIconID("09d");
+
+            //Test 2
             MeteoRoom town2 = new MeteoRoom();
-            //Test avec Londres
             town2.setId(2);
             town2.setTemperature(42.42);
             town2.setTownName("Moscou");
             town2.setIconID("09d");
-            meteoDao.insert(town, town2);
+
+           //Test 3
+           MeteoRoom town3 = new MeteoRoom();
+           town3 .setId(3);
+           town3.setTemperature(0);
+           //town3.setTownName("xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"); Un nom trop long ne passe pas
+           town3.setTownName("new york");
+           town3.setIconID("09d");
+
+           //Test 3
+           MeteoRoom town4 = new MeteoRoom();
+           town4 .setId(4);
+           town4.setTemperature(0);
+           town4.setTownName("Paris");
+           town4.setIconID("09d");
+
+            meteoDao.insert(town, town2, town3, town4);
         }
 
     public void accessApiTest(){

@@ -82,8 +82,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (item.getItemId()) {
             case R.id.action_settings:
                 Toast.makeText(this, R.string.action_settings, Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.action_addItem:
+                return true;
+
+            /*case R.id.action_addItem:
                 Toast.makeText(this, R.string.action_addItem, Toast.LENGTH_SHORT).show();
                 addMarker("titre default", -1);
                 break;
@@ -95,7 +96,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 break;
             case R.id.action_deleteMarker:
                 if(selectedMarker != null)
-                    selectedMarker.remove();
+                    selectedMarker.remove();*/
+
         }
 
         return super.onOptionsItemSelected(item);

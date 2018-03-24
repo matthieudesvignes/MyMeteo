@@ -17,7 +17,7 @@ public class Repository {
 
     public Repository(){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://api.openweathermap.org/data/2.5/") //forecast?id=524901&APPID=7d4cb01ae28e955cb88aca49a5432d95")
+                .baseUrl("http://api.openweathermap.org/data/2.5/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         service = retrofit.create(OpenWeatherService.class);

@@ -3,6 +3,8 @@ package iut.desvignes.mymeteo;
 import android.arch.lifecycle.LiveData;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
+import android.widget.Toast;
+
 import java.io.Serializable;
 
 /**
@@ -43,10 +45,17 @@ public class MeteoPresenter implements Serializable{
         //insertTestTown();
     }
 
+    public void onFlottingButton() {
+        view.showMessage("onFloattingButton");
+    }
+
     public void onRefresh() {
         view.showMessage("onRefresh");
        // MeteoModel town = repository.getTownByName("London");
         //meteoDao.insert(town);
+    }
+
+    public void refreshData() {
     }
 
     // Méthode invoqué par le dialogue
@@ -62,25 +71,30 @@ public class MeteoPresenter implements Serializable{
         meteoDao.insert(town);
     }
 
-
     public int getImageID(){
         //todo
         return R.drawable.icon_01d;
     }
-       /*public void insertTestTown(){
+
+       public void insertTestTown(){
             //meteoDao.deleteAll(meteoDao.getAllTownsList());
-            MeteoModel town = new MeteoModel();
+            MeteoRoom town = new MeteoRoom();
             //Test avec Londres
             town.setId(3);
             town.setTemperature(45);
             town.setTownName("berlin");
             town.setIconID("09d");
-            MeteoModel town2 = new MeteoModel();
+            MeteoRoom town2 = new MeteoRoom();
             //Test avec Londres
             town2.setId(2);
             town2.setTemperature(42.42);
             town2.setTownName("Moscou");
             town2.setIconID("09d");
             meteoDao.insert(town, town2);
-        }*/
+        }
+
+    public void accessApiTest(){
+           MeteoModel res = repository.getTownByName("paris");
+           view.showMessage("nom : " + res.getName() + " iconId : " +res.getIcon());
+    }
 }

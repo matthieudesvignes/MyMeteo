@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 /**
  * Created by androidS4 on 19/03/18.
  */
-@Database(entities = {MeteoRoom.class}, version = 2)
+@Database(entities = {MeteoRoom.class}, version = 1)
 public abstract class MeteoDatabase extends RoomDatabase{
 
     public abstract MeteoDao getMeteoDao();
@@ -23,17 +23,17 @@ public abstract class MeteoDatabase extends RoomDatabase{
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     MeteoDatabase.class,
                     "meteo.db")
-                    .addMigrations(MIGRATION_1_2)
+                    //.addMigrations(MIGRATION_1_2)
                     .build();
         }
         return instance;
     }
 
-    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+    /*static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase db) {
             db.execSQL("ALTER TABLE meteo_table ADD COLUMN lat DOUBLE") ;
             db.execSQL("ALTER TABLE meteo_table ADD COLUMN lng DOUBLE") ;
         }
-    };
+    };*/
 }

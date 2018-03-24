@@ -1,6 +1,7 @@
 package iut.desvignes.mymeteo;
 
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -40,8 +41,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
 
         // on click du bouton flottant
         floatingActionButton.setOnClickListener(view ->{
+            presenter.onFlottingButton();
             pool.submit(() ->
-                    presenter.addTown("London"));
+                    presenter.accessApiTest());
         });
 
         //Lien Vue-Presenter + gestion du cycle de vie
@@ -72,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
 
         recyclerView.setAdapter(adapter);
         presenter.setRepository(new Repository());
+
+        // Rafraichissement des données
+        pool.submit(() -> presenter.refreshData());
     }
 
     //------ Méthode pour le menu appBar -------//
@@ -85,11 +90,12 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_refresh :
-                pool.submit(() -> presenter.onRefresh());
+                presenter.onRefresh();
+                pool.submit(() -> presenter.refreshData());
                 //startActivity(new Intent(this, MapsActivity.class)); TODO
                 return true;
             case R.id.action_settings :
-                pool.submit(() -> presenter.onSettings());
+                presenter.onSettings();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -97,7 +103,13 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
 
     //------ Méthodes de l'interface Vue -------//
     @Override
-    public void showMessage(String message) {
+    public void showMessage(String message)
+    {
+        if(!isUiThread()){
+            runOnUiThread(() -> showMessage(message));
+            return;
+        }
+
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
@@ -131,4 +143,11 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         pool.shutdown();
         super.onDestroy();
     }
+
+    // gestion threads
+    private boolean isUiThread(){
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
+
+
 }

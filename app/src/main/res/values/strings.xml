@@ -12,4 +12,8 @@
     <string name="network_off">Network OFF</string>
     <string name="enable_refresh">Enable refresh data button</string>
     <string name="Refresh_button_disabled">Refresh Button is disabled</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_title">Add a city</string>
+    <string name="dialog_message">Please enter a city name (in english)</string>
 </resources>

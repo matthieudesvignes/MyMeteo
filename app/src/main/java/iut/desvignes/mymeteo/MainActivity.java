@@ -26,17 +26,18 @@ import android.widget.Toast;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements MeteoView{
+public class MainActivity extends AppCompatActivity implements MeteoView, Dialog.Listener{
 
     //Initialisation des vues de l'activité
     private Toolbar appBar;
     private RecyclerView recyclerView;
-    private ExecutorService pool;
-    private MeteoPresenter presenter;
-    private MeteoAdapter adapter;
-
     private FloatingActionButton floatingActionButton;
     private CoordinatorLayout meteoCoordinator;
+
+    private ExecutorService pool;
+
+    private MeteoPresenter presenter;
+    private MeteoAdapter adapter;
 
     // Check le réseau, active le bouton refresh si connecté, désactive sinon
     private boolean isNetworkOn;
@@ -66,9 +67,10 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         floatingActionButton = findViewById(R.id.fab);
 
         // on click du bouton flottant
-        floatingActionButton.setOnClickListener(view ->{
-            presenter.onFlottingButton();
-            pool.submit(() -> presenter.addByDialog("azertyuiop")); }); // TODO
+        floatingActionButton.setOnClickListener(view -> {
+            Dialog.show(this);
+            //presenter.onFlottingButton();
+        });
 
         //Lien Vue-Presenter + gestion du cycle de vie
         if (getLastCustomNonConfigurationInstance() != null)
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_refresh :
-                if(!isNetworkOn)
+                if(!isNetworkOn )
                     Toast.makeText(this, R.string.network_off, Toast.LENGTH_SHORT).show();
                 else if(!getPrefRefresh)
                     Toast.makeText(this, R.string.Refresh_button_disabled, Toast.LENGTH_SHORT).show();
@@ -200,5 +202,12 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     // gestion threads
     private boolean isUiThread(){
         return Looper.myLooper() == Looper.getMainLooper();
+    }
+
+
+    // Méthode de l'interface Listener du Dialog
+    @Override
+    public void onOk(Dialog dialog, String townName) {
+        pool.submit(() -> presenter.addByDialog(townName));
     }
 }

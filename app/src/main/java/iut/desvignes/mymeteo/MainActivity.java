@@ -1,5 +1,11 @@
 package iut.desvignes.mymeteo;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.design.widget.CoordinatorLayout;
@@ -30,6 +36,20 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     private FloatingActionButton floatingActionButton;
     private CoordinatorLayout meteoCoordinator;
 
+    // Check le réseau, active le bouton refresh si connecté, désactive sinon
+    private boolean isNetworkOn;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    ConnectivityManager cm  = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+                    if (networkInfo != null)
+                        isNetworkOn = true;
+                    else
+                        isNetworkOn = false;
+                }
+            };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         // on click du bouton flottant
         floatingActionButton.setOnClickListener(view ->{
             presenter.onFlottingButton();
-            pool.submit(() -> presenter.insertTestTown()); });
+            pool.submit(() -> presenter.addByDialog("azertyuiop")); }); // TODO
 
         //Lien Vue-Presenter + gestion du cycle de vie
         if (getLastCustomNonConfigurationInstance() != null)
@@ -91,8 +111,12 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_refresh :
-                presenter.onRefresh();
-                pool.submit(() -> presenter.refreshData());
+                if(isNetworkOn){
+                    presenter.onRefresh();
+                    pool.submit(() -> presenter.refreshData());
+                }else{
+                    Toast.makeText(this, R.string.network_off, Toast.LENGTH_SHORT).show();
+                }
                 //startActivity(new Intent(this, MapsActivity.class)); TODO
                 return true;
             case R.id.action_settings :
@@ -149,6 +173,19 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     protected void onDestroy() {
         pool.shutdown();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        this.registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        this.unregisterReceiver(receiver);
+        super.onPause();
     }
 
     // gestion threads

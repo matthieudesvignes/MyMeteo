@@ -8,4 +8,6 @@
     <string name="action_secondaryMenu">Secondary menu</string>
     <string name="item_deleted">A city has been deleted</string>
     <string name="undo">UNDO</string>
+    <string name="network_on">Network ON</string>
+    <string name="network_off">Network OFF</string>
 </resources>

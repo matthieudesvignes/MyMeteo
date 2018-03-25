@@ -65,6 +65,7 @@ public class MeteoPresenter implements Serializable{
     }
 
     public void refreshData() {
+        //TODO
     }
 
     public int getImageID(){
@@ -90,11 +91,11 @@ public class MeteoPresenter implements Serializable{
         meteoDao.insert(town);
     }
 
-    public void addByDialog(){
+    public void addByDialog(String name){
         MeteoRoom town = new MeteoRoom();
         town.setId(townCount);
         town.setTemperature(3.14);
-        town.setTownName("Dialog");
+        town.setTownName(name);
         town.setIconID("09d");
         meteoDao.insert(town);
         townCount ++ ;

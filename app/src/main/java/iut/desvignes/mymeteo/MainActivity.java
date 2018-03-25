@@ -4,10 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
 
     // Check le réseau, active le bouton refresh si connecté, désactive sinon
     private boolean isNetworkOn;
+    private boolean getPrefRefresh;
     private BroadcastReceiver receiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -111,16 +114,19 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_refresh :
-                if(isNetworkOn){
+                if(!isNetworkOn)
+                    Toast.makeText(this, R.string.network_off, Toast.LENGTH_SHORT).show();
+                else if(!getPrefRefresh)
+                    Toast.makeText(this, R.string.Refresh_button_disabled, Toast.LENGTH_SHORT).show();
+                else{
                     presenter.onRefresh();
                     pool.submit(() -> presenter.refreshData());
-                }else{
-                    Toast.makeText(this, R.string.network_off, Toast.LENGTH_SHORT).show();
                 }
-                //startActivity(new Intent(this, MapsActivity.class)); TODO
                 return true;
             case R.id.action_settings :
-                presenter.onSettings();
+                //presenter.onSettings();
+                startActivity(new Intent(this, SettingsActivity.class));
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -180,6 +186,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView{
         super.onResume();
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         this.registerReceiver(receiver, filter);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        getPrefRefresh = prefs.getBoolean("enable_refresh", true);
     }
 
     @Override

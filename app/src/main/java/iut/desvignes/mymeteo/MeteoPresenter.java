@@ -3,9 +3,11 @@ package iut.desvignes.mymeteo;
 import android.arch.lifecycle.LiveData;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by androidS4 on 13/03/18.
@@ -21,8 +23,6 @@ public class MeteoPresenter implements Serializable{
 
     MeteoRoom lastTownDeleted;
 
-    private int townCount = 5; // Pour le test du dialogue, à supprimer
-    // Lien entre les classes
 
     public void setMeteoDao(MeteoDao meteoDao){
         this.meteoDao = meteoDao;
@@ -41,16 +41,6 @@ public class MeteoPresenter implements Serializable{
         return townsList;
     }
 
-    // ------------- Méthode bouton du menu --------------- //
-
-
-    public void onSettings() { view.showMessage("onSettings"); }
-
-    public void onFlottingButton() {
-        view.showMessage("onFloattingButton");
-    }
-
-    public void onRefresh() { view.showMessage("onRefresh"); }
 
     // Méthode de gestion de la BD
 
@@ -64,78 +54,26 @@ public class MeteoPresenter implements Serializable{
         view.notifyItemDeleted();
     }
 
-    public void refreshData() {
-        //TODO
-    }
-
-    public int getImageID(){
-        //todo
-        return R.drawable.icon_01d;
-    }
-
-
-    /////////////////////////////////////////////////////
-    //////////////// Méthode tests //////////////////////
-    /////////////////////////////////////////////////////
-
-    // Méthode invoqué par le dialogue
-    public void addTown(String townName){
-        MeteoModel townRetrofit = repository.getTownByName(townName);
-        MeteoRoom town= new MeteoRoom();
-        town.setIconID(townRetrofit.getIcon());
-        town.setId(townRetrofit.getId());
-        town.setLat(townRetrofit.getLat());
-        town.setLng(townRetrofit.getLon());
-        town.setTemperature(townRetrofit.getTemp());
-        town.setTownName(townRetrofit.getName());
-        meteoDao.insert(town);
-    }
-
-    public void addByDialog(String name){
-        MeteoRoom town = new MeteoRoom();
-        town.setId(townCount);
-        town.setTemperature(3.14);
-        town.setTownName(name);
-        town.setIconID("09d");
-        meteoDao.insert(town);
-        townCount ++ ;
-    }
-
-       public void insertTestTown(){
-            //Test 1
-            MeteoRoom town = new MeteoRoom();
-            town.setId(1);
-            town.setTemperature(45);
-            town.setTownName("berlin");
-            town.setIconID("09d");
-
-            //Test 2
-            MeteoRoom town2 = new MeteoRoom();
-            town2.setId(2);
-            town2.setTemperature(42.42);
-            town2.setTownName("Moscou");
-            town2.setIconID("09d");
-
-           //Test 3
-           MeteoRoom town3 = new MeteoRoom();
-           town3 .setId(3);
-           town3.setTemperature(0);
-           //town3.setTownName("xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"); Un nom trop long ne passe pas
-           town3.setTownName("new york");
-           town3.setIconID("09d");
-
-           //Test 3
-           MeteoRoom town4 = new MeteoRoom();
-           town4 .setId(4);
-           town4.setTemperature(0);
-           town4.setTownName("Paris");
-           town4.setIconID("09d");
-
-            meteoDao.insert(town, town2, town3, town4);
+    public void refreshData(boolean isNetworkOn, boolean pref, ExecutorService service) {
+        if(!isNetworkOn)
+            view.showMessage(R.string.network_off);
+        else if(!pref)
+            view.showMessage(R.string.enable_refresh);
+        else{
+            view.showMessage(R.string.action_refresh);
+            //meteoDao.refreshAll() TODO
         }
 
-    public void accessApiTest(){
-           MeteoModel res = repository.getTownByName("paris");
-           view.showMessage("nom : " + res.getName() + " iconId : " +res.getIcon());
+    }
+
+    public int getImageID(MeteoRoom town){
+        return view.getIconId(town.getIconID());
+    }
+
+    // Méthode invoqué par le dialogue
+    public void addTown(String name){
+        MeteoModel townRetrofit = repository.getTownByName(name);
+        MeteoRoom town = MeteoModel.createMeteoRoom(townRetrofit);
+        meteoDao.insert(town);
     }
 }

@@ -5,7 +5,9 @@ package iut.desvignes.mymeteo;
  */
 
 public interface MeteoView {
-    void showMessage(String message);
+    void showMessage(int messageId);
 
     void notifyItemDeleted();
+
+    int getIconId(String icon);
 }

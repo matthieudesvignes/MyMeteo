@@ -100,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
 
         recyclerView.setAdapter(adapter);
         presenter.setRepository(new Repository());
-
-        // Rafraichissement des données
-        pool.submit(() -> presenter.refreshData());
     }
 
     //------ Méthode pour le menu appBar -------//
@@ -116,19 +113,10 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_refresh :
-                if(!isNetworkOn )
-                    Toast.makeText(this, R.string.network_off, Toast.LENGTH_SHORT).show();
-                else if(!getPrefRefresh)
-                    Toast.makeText(this, R.string.Refresh_button_disabled, Toast.LENGTH_SHORT).show();
-                else{
-                    presenter.onRefresh();
-                    pool.submit(() -> presenter.refreshData());
-                }
+                presenter.refreshData(isNetworkOn, getPrefRefresh, pool);
                 return true;
             case R.id.action_settings :
-                //presenter.onSettings();
                 startActivity(new Intent(this, SettingsActivity.class));
-
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -136,20 +124,25 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
 
     //------ Méthodes de l'interface Vue -------//
     @Override
-    public void showMessage(String message)
+    public void showMessage(int messageId)
     {
         if(!isUiThread()){
-            runOnUiThread(() -> showMessage(message));
+            runOnUiThread(() -> showMessage(messageId));
             return;
         }
 
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, messageId, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public int getIconId(String icon) {
+        int id = getResources().getIdentifier("icon_" + icon, "drawable", this.getPackageName());
+        return id;
     }
 
 
+
     // --------- Méthode Adapter ----------------- //
-
-
 
     @Override
     public void notifyItemDeleted() {
@@ -207,7 +200,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
 
     // Méthode de l'interface Listener du Dialog
     @Override
-    public void onOk(Dialog dialog, String townName) {
-        pool.submit(() -> presenter.addByDialog(townName));
+    public void onOk(Dialog dialog, String name) {
+        Log.i("message", "onOk => id : " + name);
+        pool.submit(() -> presenter.addTown(name));
+        //pool.submit(()-> presenter.accessApiTest());
     }
 }

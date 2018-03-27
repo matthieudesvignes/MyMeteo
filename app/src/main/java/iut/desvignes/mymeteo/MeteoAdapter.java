@@ -62,8 +62,8 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
 
         public void displayTown(MeteoRoom town) {
             nameView.setText(town.getTownName());
-            tempView.setText(Double.toString(town.getTemperature()));
-            imageView.setImageResource(presenter.getImageID());
+            tempView.setText(Double.toString(town.getTemperature()) + "°C");
+            imageView.setImageResource(presenter.getImageID(town));
         }
 
     @Override

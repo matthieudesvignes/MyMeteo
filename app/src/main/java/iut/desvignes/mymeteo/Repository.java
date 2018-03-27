@@ -1,5 +1,7 @@
 package iut.desvignes.mymeteo;
 
+import android.util.Log;
+
 import java.io.IOException;
 
 import retrofit2.Call;
@@ -27,9 +29,11 @@ public class Repository {
         try {
             Call<MeteoModel> call = service.getTownByName(townName);
             Response<MeteoModel> response = call.execute();
+            Log.i("Message", response.toString());
             return response.body();
         } catch (IOException e) {
             return null;
         }
     }
+
 }

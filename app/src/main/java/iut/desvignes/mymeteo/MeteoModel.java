@@ -14,9 +14,6 @@ import com.google.gson.annotations.SerializedName;
 public class MeteoModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
-
-
-
     public String getName() { return nameCity; }
 
     public int getId(){ return this.idCity; }

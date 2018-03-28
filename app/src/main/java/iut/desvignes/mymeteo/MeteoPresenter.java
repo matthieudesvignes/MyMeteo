@@ -3,10 +3,13 @@ package iut.desvignes.mymeteo;
 import android.arch.lifecycle.LiveData;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -22,7 +25,8 @@ public class MeteoPresenter implements Serializable{
     private transient MeteoDao meteoDao;
 
     MeteoRoom lastTownDeleted;
-
+    private long lastClickTimeStamp = 0;
+    private long nextClickTimeStamp = 0;
 
     public void setMeteoDao(MeteoDao meteoDao){
         this.meteoDao = meteoDao;
@@ -54,16 +58,32 @@ public class MeteoPresenter implements Serializable{
         view.notifyItemDeleted();
     }
 
-    public void refreshData(boolean isNetworkOn, boolean pref, ExecutorService service) {
+    public void onRefreshData(boolean isNetworkOn, boolean pref, ExecutorService service) {
         if(!isNetworkOn)
             view.showMessage(R.string.network_off);
         else if(!pref)
             view.showMessage(R.string.enable_refresh);
-        else{
-            view.showMessage(R.string.action_refresh);
-            //meteoDao.refreshAll() TODO
+        else if(lastClickTimeStamp < nextClickTimeStamp){
+            lastClickTimeStamp = SystemClock.elapsedRealtime();
+            view.showMessage(R.string.wait_until);
+        }else{
+            service.submit(()->refreshData());
         }
+    }
 
+    private void refreshData() {
+        lastClickTimeStamp = SystemClock.elapsedRealtime();
+        nextClickTimeStamp = SystemClock.elapsedRealtime() + 300000;
+        List<MeteoRoom> oldListRoom = meteoDao.getAllTownsList();
+        ArrayList<MeteoRoom> newListRoom = new ArrayList<MeteoRoom>();
+        MeteoRoom townRoom;
+        MeteoModel townRetrofit;
+        for(int i = 0; i < oldListRoom.size(); i++){
+            townRetrofit = repository.getTownById(oldListRoom.get(i).getId());
+            townRoom = MeteoModel.createMeteoRoom(townRetrofit);
+            newListRoom.add(townRoom);
+        }
+        meteoDao.update(newListRoom);
     }
 
     public int getImageID(MeteoRoom town){

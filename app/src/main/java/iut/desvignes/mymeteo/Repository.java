@@ -29,7 +29,16 @@ public class Repository {
         try {
             Call<MeteoModel> call = service.getTownByName(townName);
             Response<MeteoModel> response = call.execute();
-            Log.i("Message", response.toString());
+            return response.body();
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public MeteoModel getTownById(int id){
+        try {
+            Call <MeteoModel> call = service.getTownById(id);
+            Response<MeteoModel> response = call.execute();
             return response.body();
         } catch (IOException e) {
             return null;

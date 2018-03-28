@@ -47,7 +47,7 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
         MeteoRoom town = this.getItem(position);
         if(town != null) holder.displayTown(town);
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public class TownViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
         private TextView nameView, tempView;
         private ImageView imageView;

@@ -23,17 +23,9 @@ public abstract class MeteoDatabase extends RoomDatabase{
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     MeteoDatabase.class,
                     "meteo.db")
-                    //.addMigrations(MIGRATION_1_2)
                     .build();
         }
         return instance;
     }
 
-    /*static final Migration MIGRATION_1_2 = new Migration(1, 2) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase db) {
-            db.execSQL("ALTER TABLE meteo_table ADD COLUMN lat DOUBLE") ;
-            db.execSQL("ALTER TABLE meteo_table ADD COLUMN lng DOUBLE") ;
-        }
-    };*/
 }

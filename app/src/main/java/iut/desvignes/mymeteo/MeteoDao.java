@@ -8,6 +8,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import java.util.ArrayList;
 import java.util.List;
 /**
  * Created by androidS4 on 06/03/18.
@@ -27,16 +28,6 @@ public interface MeteoDao {
     @Delete
     void deleteSelectedTown(MeteoRoom town);
 
-///////////////////////////////////////////////////////////////////////////////
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertList(List<MeteoRoom> towns);
-
-    @Query("SELECT * FROM town_table LIMIT 1")
-    MeteoRoom getFirstTown();
-
-    @Delete
-    void deleteAll(List<MeteoRoom> towns);
-
     @Update
-    void update(MeteoRoom... towns);
+    void update(ArrayList<MeteoRoom> towns);
 }

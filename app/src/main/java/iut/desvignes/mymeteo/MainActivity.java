@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -69,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
         // on click du bouton flottant
         floatingActionButton.setOnClickListener(view -> {
             Dialog.show(this);
-            //presenter.onFlottingButton();
         });
 
         //Lien Vue-Presenter + gestion du cycle de vie
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_refresh :
-                presenter.refreshData(isNetworkOn, getPrefRefresh, pool);
+                presenter.onRefreshData(isNetworkOn, getPrefRefresh,  pool);
                 return true;
             case R.id.action_settings :
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -201,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
     // Méthode de l'interface Listener du Dialog
     @Override
     public void onOk(Dialog dialog, String name) {
-        Log.i("message", "onOk => id : " + name);
         pool.submit(() -> presenter.addTown(name));
-        //pool.submit(()-> presenter.accessApiTest());
     }
 }

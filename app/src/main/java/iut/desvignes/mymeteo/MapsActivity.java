@@ -1,13 +1,6 @@
 package iut.desvignes.mymeteo;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,16 +13,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, Dialog.Listener {
 
     private GoogleMap mMap;
     private Toolbar appbar;
 
     // Classe représentant un couple Latitude/Longitude
-    private LatLng currentLatLng = new LatLng(49.240065, 4.062048); // batiment U
+    private LatLng currentLatLng ;
+    private MeteoRoom currentTown;
+    private MeteoRoom[] townsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +38,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // ToolBar
         appbar = findViewById(R.id.appbar);
         setSupportActionBar(appbar);
+
+        if(getIntent() != null && getIntent().getExtras() != null){
+            currentTown = (MeteoRoom) getIntent().getExtras().get("currentTown");
+            townsList = (MeteoRoom[]) getIntent().getExtras().get("townsList");
+            currentLatLng = new LatLng(currentTown.getLat(), currentTown.getLng()); // batiment U
+        }
     }
 
     // ----------------- Menu Appbar --------------- //
@@ -62,21 +63,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void addMarker(String title, int iconId) {
-
+    private void addMarker(String name, String icon) {
         mMap.clear();
 
-        if(iconId != -1){
-            mMap.addMarker(new MarkerOptions().title(title)
+        int id = getResources().getIdentifier("icon_" + icon, "drawable", this.getPackageName());
+
+        mMap.addMarker(new MarkerOptions().title(name)
                     .position(currentLatLng)
-                    .icon(BitmapDescriptorFactory.fromResource(iconId))
-            );}
-        else{
-            mMap.addMarker(new MarkerOptions().title(title)
-                    .position(currentLatLng)
-                    .icon(BitmapDescriptorFactory.defaultMarker())
+                    .icon(BitmapDescriptorFactory.fromResource(id))
             );
-        }
     }
 
     @Override
@@ -86,6 +81,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.currentLatLng, 1));
 
+        for(int i = 0; i < townsList.length; i++){
+            addMarker(townsList[i].getTownName(), townsList[i].getIconID());
+        }
+    }
+
+    @Override
+    public void onOk(Dialog dialog, String townName) {
+        //todo
     }
 }
 

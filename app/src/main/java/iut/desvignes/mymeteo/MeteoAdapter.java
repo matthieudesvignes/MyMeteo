@@ -1,6 +1,7 @@
 package iut.desvignes.mymeteo;
 
 import android.arch.paging.PagedListAdapter;
+import android.content.Intent;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -48,7 +49,7 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
         if(town != null) holder.displayTown(town);
     }
 
-    public class TownViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
+    public class TownViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener{
         private TextView nameView, tempView;
         private ImageView imageView;
 
@@ -58,6 +59,7 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
             tempView = itemView.findViewById(R.id.textViewTemp);
             imageView = itemView.findViewById(R.id.imageView);
             itemView.setOnLongClickListener(this);
+            itemView.setOnClickListener(this);
         }
 
         public void displayTown(MeteoRoom town) {
@@ -71,5 +73,10 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
         service.submit(() -> presenter.delete(MeteoAdapter.this.getItem(getAdapterPosition())));
         return true;
     }
-}
+
+        @Override
+        public void onClick(View v) {
+            service.submit(()->presenter.launchMap(MeteoAdapter.this.getItem(getAdapterPosition())));
+        }
+    }
 }

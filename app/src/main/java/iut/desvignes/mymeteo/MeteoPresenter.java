@@ -96,4 +96,8 @@ public class MeteoPresenter implements Serializable{
         MeteoRoom town = MeteoModel.createMeteoRoom(townRetrofit);
         meteoDao.insert(town);
     }
+
+    public void launchMap(MeteoRoom town) {
+        view.launchMap(town, meteoDao.getAllTownsList());
+    }
 }

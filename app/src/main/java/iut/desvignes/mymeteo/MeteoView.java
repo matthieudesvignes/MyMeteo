@@ -1,10 +1,6 @@
 package iut.desvignes.mymeteo;
 
-import java.util.List;
-
-/**
- * Created by androidS4 on 13/03/18.
- */
+import java.util.ArrayList;
 
 public interface MeteoView {
     void showMessage(int messageId);
@@ -13,5 +9,5 @@ public interface MeteoView {
 
     int getIconId(String icon);
 
-    void launchMap(MeteoRoom town, List<MeteoRoom> allTownsList);
+    void launchMap(MeteoRoom town);
 }

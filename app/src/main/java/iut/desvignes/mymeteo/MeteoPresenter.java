@@ -98,6 +98,6 @@ public class MeteoPresenter implements Serializable{
     }
 
     public void launchMap(MeteoRoom town) {
-        view.launchMap(town, meteoDao.getAllTownsList());
+        view.launchMap(town);
     }
 }

@@ -1,6 +1,7 @@
 package iut.desvignes.mymeteo;
 
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -15,34 +16,50 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, Dialog.Listener {
+
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, Dialog.Listener{
 
     private GoogleMap mMap;
     private Toolbar appbar;
 
+    private MeteoPresenter presenter;
+    /*private FloatingActionButton fab;
+    private ExecutorService pool;*/
+
     // Classe représentant un couple Latitude/Longitude
-    private LatLng currentLatLng ;
+    private LatLng currentLatLng; // = new LatLng(4.45, 750.52);
     private MeteoRoom currentTown;
-    private MeteoRoom[] townsList;
+    private MeteoDao meteoDao;
+    private List<MeteoRoom> townsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        //pool = Executors.newSingleThreadExecutor();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        /*fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v->{
+            Dialog.show(this);
+        });*/
+
         // ToolBar
         appbar = findViewById(R.id.appbar);
         setSupportActionBar(appbar);
 
-        if(getIntent() != null && getIntent().getExtras() != null){
+       if(getIntent() != null && getIntent().getExtras() != null){
             currentTown = (MeteoRoom) getIntent().getExtras().get("currentTown");
-            townsList = (MeteoRoom[]) getIntent().getExtras().get("townsList");
-            currentLatLng = new LatLng(currentTown.getLat(), currentTown.getLng()); // batiment U
+            currentLatLng = new LatLng(currentTown.getLat(), currentTown.getLng());
+            //presenter = (MeteoPresenter) getIntent().getExtras().get("presenter");
         }
     }
 
@@ -63,13 +80,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void addMarker(String name, String icon) {
+    private void addMarker(String name, String icon, double lat, double lng) {
         mMap.clear();
 
         int id = getResources().getIdentifier("icon_" + icon, "drawable", this.getPackageName());
 
         mMap.addMarker(new MarkerOptions().title(name)
-                    .position(currentLatLng)
+                    .position(new LatLng(lat, lng))
                     .icon(BitmapDescriptorFactory.fromResource(id))
             );
     }
@@ -79,16 +96,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.currentLatLng, 1));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.currentLatLng, 14));
 
-        for(int i = 0; i < townsList.length; i++){
-            addMarker(townsList[i].getTownName(), townsList[i].getIconID());
+        townsList = meteoDao.getAllTownsList();
+        for(int i = 0; i < townsList.size(); i++){
+            addMarker(townsList.get(i).getTownName(), townsList.get(i).getIconID(), townsList.get(i).getLat(), townsList.get(i).getLng());
         }
     }
 
     @Override
     public void onOk(Dialog dialog, String townName) {
-        //todo
+        //pool.submit(()->presenter.addTown(townName));
     }
+
+
 }
 

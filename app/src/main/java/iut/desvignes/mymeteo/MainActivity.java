@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -142,10 +143,12 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
     }
 
     @Override
-    public void launchMap(MeteoRoom town, List<MeteoRoom> allTownsList) {
+    public void launchMap(MeteoRoom town) {
+        Log.i("Message", "launchMap MainActivity()");
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("currentTown", town);
-        intent.putExtra("townsList", allTownsList.toArray());
+        //intent.putExtra("townsList", allTownsList);
+        //intent.putExtra("presenter", presenter);
         startActivity(intent);
     }
 

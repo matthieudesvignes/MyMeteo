@@ -1,5 +1,6 @@
 package iut.desvignes.mymeteo;
 
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
     private MeteoPresenter presenter;
     private MeteoAdapter adapter;
 
+    private MeteoRoom townPref = null;
+
     // Check le réseau, active le bouton refresh si connecté, désactive sinon
     private boolean isNetworkOn;
     private boolean getPrefRefresh;
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
                         isNetworkOn = false;
                 }
             };
+
+    private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +108,36 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
 
         recyclerView.setAdapter(adapter);
         presenter.setRepository(new Repository());
+
+        /////////////////////// WIDGET //////////////////////////
+        townPref = new MeteoRoom();
+        townPref.setTownName("Pas de ville favori");
+        townPref.setTemperature(42);
+        townPref.setIconID("01d");
+
+        setResult(RESULT_CANCELED);
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                    AppWidgetManager.INVALID_APPWIDGET_ID);
+        }
+        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            Log.i("Message", "Configuration Activity: no appwidget id provided");
+        }
+        configureWidget(getApplicationContext());
+        Intent resultValue = new Intent();
+        resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+        setResult(RESULT_OK, resultValue);
     }
+
+    public void configureWidget(Context context) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        if(this.townPref != null)
+            MeteoWidgetProvider.setFavoriteTown(townPref);
+        MeteoWidgetProvider.updateAppWidget(context, appWidgetManager, mAppWidgetId, townPref);
+    }
+
 
     //------ Méthode pour le menu appBar -------//
     @Override

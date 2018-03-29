@@ -118,7 +118,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //addMarker(currentTown.getTownName(), currentTown.getIconID(), currentTown.getLat(), currentTown.getLng());
 
         presenter.drawMarkers(arrayName, arrayIcon, arrayLat, arrayLng);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.currentLatLng, 14));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.currentLatLng, 10));
 
         fabMaps.setOnClickListener(v -> {
             LatLng targetLatLng = mMap.getCameraPosition().target;
@@ -126,11 +126,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             List<Address> addresses = null;
             try {
                 addresses = geocoder.getFromLocation(targetLatLng.latitude, targetLatLng.longitude, 1);
-                String cityName = addresses.get(0).getAddressLine(0);
-                DialogMaps.show(this, cityName);
+                if(addresses != null && addresses.size() > 0){
+                    String cityName = addresses.get(0).getLocality();
+                    DialogMaps.show(this, cityName);
+                }else
+                    DialogMaps.show(this, "");
             } catch (IOException e) {
-                Log.i("Message", e.toString());
-                DialogMaps.show(this, "Error : No city found");
+
             }
         });
     }
@@ -156,7 +158,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onOk(DialogMaps dialog, String townName) {
         Intent intent = new Intent(this, MainActivity.class);
-        Log.i("Message", "townName : " + townName);
         intent.putExtra("cityNameAdded", townName);
         startActivity(intent);
         this.finish();

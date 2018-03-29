@@ -196,11 +196,8 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         getPrefRefresh = prefs.getBoolean("enable_refresh", true);
-        Log.i("Message", "onResume()");
-        Log.i("Message", "intent et extra existent ? " + Boolean.toString(getIntent() != null && getIntent().getExtras() != null));
         if(getIntent() != null && getIntent().getExtras() != null){
             String name = getIntent().getExtras().getString("cityNameAdded");
-            Log.i("Message", "onResume() MainActivity name : " + name);
             pool.submit(() -> presenter.addTown(name));
         }
     }

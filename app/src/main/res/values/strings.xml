@@ -17,4 +17,5 @@
     <string name="dialog_title">Add a city</string>
     <string name="dialog_message">Please enter a city name (in english)</string>
     <string name="wait_until">You have to wait 5 mn between each refreshing</string>
+    <string name="add_this_town">Add this town ?</string>
 </resources>

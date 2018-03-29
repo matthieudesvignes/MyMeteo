@@ -1,10 +1,13 @@
 package iut.desvignes.mymeteo;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -13,24 +16,27 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, MapsView {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, MapsView, DialogMaps.Listener {
 
     private GoogleMap mMap;
     private Toolbar appbar;
 
     private MapsPresenter presenter;
 
-    //private FloatingActionButton fab;
+    private FloatingActionButton fabMaps;
     private ExecutorService pool;
 
     // Classe représentant un couple Latitude/Longitude
@@ -49,6 +55,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        fabMaps = findViewById(R.id.fabMaps);
 
         // ToolBar
         appbar = findViewById(R.id.appbar);
@@ -104,11 +112,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.clear();
+        UiSettings uiSettings = mMap.getUiSettings();
+        uiSettings.setMapToolbarEnabled(false);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         //addMarker(currentTown.getTownName(), currentTown.getIconID(), currentTown.getLat(), currentTown.getLng());
 
         presenter.drawMarkers(arrayName, arrayIcon, arrayLat, arrayLng);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.currentLatLng, 14));
+
+        fabMaps.setOnClickListener(v -> {
+            LatLng targetLatLng = mMap.getCameraPosition().target;
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses = null;
+            try {
+                addresses = geocoder.getFromLocation(targetLatLng.latitude, targetLatLng.longitude, 1);
+                String cityName = addresses.get(0).getAddressLine(0);
+                DialogMaps.show(this, cityName);
+            } catch (IOException e) {
+                Log.i("Message", e.toString());
+                DialogMaps.show(this, "Error : No city found");
+            }
+        });
     }
 
     @Override
@@ -129,9 +153,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onDestroy();
     }
 
-    /*@Override
-    public void onOk(Dialog dialog, String townName) {
-        //pool.submit(()->presenter.addTown(townName));
-    }*/
+    @Override
+    public void onOk(DialogMaps dialog, String townName) {
+        Intent intent = new Intent(this, MainActivity.class);
+        Log.i("Message", "townName : " + townName);
+        intent.putExtra("cityNameAdded", townName);
+        startActivity(intent);
+        this.finish();
+    }
 }
 

@@ -1,6 +1,6 @@
 package iut.desvignes.mymeteo;
 
-import java.util.ArrayList;
+
 
 public interface MeteoView {
     void showMessage(int messageId);
@@ -9,5 +9,5 @@ public interface MeteoView {
 
     int getIconId(String icon);
 
-    void launchMap(MeteoRoom town);
+    void launchMap(MeteoRoom town, String[] arrayName, String[] arrayIcon, double[] arrayLat, double[] arrayLng);
 }

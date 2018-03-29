@@ -98,6 +98,17 @@ public class MeteoPresenter implements Serializable{
     }
 
     public void launchMap(MeteoRoom town) {
-        view.launchMap(town);
+        List<MeteoRoom> list = meteoDao.getAllTownsList();
+        String[] arrayName = new String[list.size()];
+        String[] arrayIcon = new String[list.size()];
+        double[] arrayLat = new double[list.size()];
+        double[] arrayLng = new double[list.size()];
+        for(int i = 0; i < list.size(); i++){
+            arrayName[i] = list.get(i).getTownName();
+            arrayIcon[i] = list.get(i).getIconID();
+            arrayLat[i] = list.get(i).getLat();
+            arrayLng[i] = list.get(i).getLng();
+        }
+        view.launchMap(town, arrayName, arrayIcon, arrayLat, arrayLng);
     }
 }

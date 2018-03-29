@@ -143,12 +143,13 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
     }
 
     @Override
-    public void launchMap(MeteoRoom town) {
-        Log.i("Message", "launchMap MainActivity()");
+    public void launchMap(MeteoRoom town, String[] arrayName, String[] arrayIcon, double[] arrayLat, double[] arrayLng) {
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("currentTown", town);
-        //intent.putExtra("townsList", allTownsList);
-        //intent.putExtra("presenter", presenter);
+        intent.putExtra("arrayName", arrayName);
+        intent.putExtra("arrayIcon", arrayIcon);
+        intent.putExtra("arrayLat", arrayLat);
+        intent.putExtra("arrayLng", arrayLng);
         startActivity(intent);
     }
 

@@ -3,13 +3,8 @@ package iut.desvignes.mymeteo;
 import java.io.Serializable;
 import java.util.List;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by androidS4 on 13/03/18.
- */
+import com.google.gson.annotations.SerializedName;
 
 public class MeteoModel implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -46,6 +41,7 @@ public class MeteoModel implements Serializable {
         @SerializedName("icon") String icon;
     }
 
+    // Crée une instance de Ville au format Room grâce à une ville format retrofit passée en paramètre
     public static MeteoRoom createMeteoRoom(MeteoModel townRetrofit){
         MeteoRoom town = new MeteoRoom();
         town.setIconID(townRetrofit.getIcon());

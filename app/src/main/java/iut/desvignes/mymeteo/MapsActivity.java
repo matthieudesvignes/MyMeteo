@@ -7,11 +7,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,9 +17,7 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -33,18 +28,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private Toolbar appbar;
-
     private MapsPresenter presenter;
-
     private FloatingActionButton fabMaps;
     private ExecutorService pool;
-
-    // Classe représentant un couple Latitude/Longitude
-    private LatLng currentLatLng; // = new LatLng(4.45, 750.52);
+    private LatLng currentLatLng;
     private MeteoRoom currentTown;
     private String[] arrayIcon, arrayName;
     private double[] arrayLat, arrayLng;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +60,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             presenter = new MapsPresenter();
         presenter.setView(this);
 
+        //récuparation des extras de l'intent
         if(getIntent() != null && getIntent().getExtras() != null){
             currentTown = (MeteoRoom) getIntent().getExtras().get("currentTown");
             currentLatLng = new LatLng(currentTown.getLat(), currentTown.getLng());
@@ -99,6 +90,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onCreateOptionsMenu(menu);
     }
 
+    // Méthode de l'interface View
     @Override
     public void addMarker(String name, String icon,LatLng latLng) {
         int id = getResources().getIdentifier("icon_" + icon, "drawable", this.getPackageName());
@@ -137,6 +129,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    // Cycle de vie
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
         return presenter;
@@ -155,6 +148,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onDestroy();
     }
 
+    // Interface Listner du DialogMaps
     @Override
     public void onOk(DialogMaps dialog, String townName) {
         Intent intent = new Intent(this, MainActivity.class);

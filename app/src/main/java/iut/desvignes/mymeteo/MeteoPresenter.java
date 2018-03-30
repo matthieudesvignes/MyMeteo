@@ -4,9 +4,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 import android.os.SystemClock;
-import android.util.Log;
-import android.widget.Toast;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,9 +49,10 @@ public class MeteoPresenter implements Serializable{
         meteoDao.insert(lastTownDeleted);
     }
 
-    public void delete(MeteoRoom town) {
-        lastTownDeleted = town;
-        meteoDao.deleteSelectedTown(town);
+    public void delete(int pos) {
+        List<MeteoRoom> room = meteoDao.getAllTownsList();
+        lastTownDeleted = room.get(pos);
+        meteoDao.deleteSelectedTown(room.get(pos));
         view.notifyItemDeleted();
     }
 
@@ -111,4 +109,10 @@ public class MeteoPresenter implements Serializable{
         }
         view.launchMap(town, arrayName, arrayIcon, arrayLat, arrayLng);
     }
+
+    public void getPrefTown(MeteoRoom town){
+        view.setPrefTown(town);
+        view.showMessage(R.string.add_favorite);
+    }
+
 }

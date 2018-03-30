@@ -10,8 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Looper;
-import android.os.SystemClock;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -20,14 +18,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,13 +33,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
     private CoordinatorLayout meteoCoordinator;
-
     private ExecutorService pool;
-
     private MeteoPresenter presenter;
     private MeteoAdapter adapter;
-
-    private MeteoRoom townPref = null;
 
     // Check le réseau, active le bouton refresh si connecté, désactive sinon
     private boolean isNetworkOn;
@@ -61,7 +52,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
                 }
             };
 
+    // attributs pour la gestion du Widget
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private MeteoRoom townPref = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +92,9 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
 
         // gestion adapter + repository
         adapter = new MeteoAdapter(pool, presenter);
-
-
         presenter.getTownsList().observe(this, towns -> {
                                                                 adapter.submitList(towns);
                                                             });
-
-
         recyclerView.setAdapter(adapter);
         presenter.setRepository(new Repository());
 
@@ -122,19 +111,39 @@ public class MainActivity extends AppCompatActivity implements MeteoView, Dialog
             mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID);
         }
-        if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-            Log.i("Message", "Configuration Activity: no appwidget id provided");
-        }
         configureWidget(getApplicationContext());
         Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
         setResult(RESULT_OK, resultValue);
+
+        // Gestion du balayage
+        ItemTouchHelper.SimpleCallback callback =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                        pool.submit(()->presenter.delete(viewHolder.getAdapterPosition()));
+                    }
+                };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+
+    // Méthodes pour le widget
+    @Override
+    public void setPrefTown(MeteoRoom town){
+        this.townPref = town;
+        configureWidget(getApplicationContext());
     }
 
     public void configureWidget(Context context) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        if(this.townPref != null)
-            MeteoWidgetProvider.setFavoriteTown(townPref);
+        MeteoWidgetProvider.setFavoriteTown(townPref);
         MeteoWidgetProvider.updateAppWidget(context, appWidgetManager, mAppWidgetId, townPref);
     }
 

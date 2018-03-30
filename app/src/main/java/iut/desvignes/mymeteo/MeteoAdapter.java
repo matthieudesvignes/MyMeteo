@@ -1,7 +1,6 @@
 package iut.desvignes.mymeteo;
 
 import android.arch.paging.PagedListAdapter;
-import android.content.Intent;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -70,12 +68,12 @@ public class MeteoAdapter extends PagedListAdapter<MeteoRoom, MeteoAdapter.TownV
 
     @Override
     public boolean onLongClick(View v) {
-        service.submit(() -> presenter.delete(MeteoAdapter.this.getItem(getAdapterPosition())));
+        presenter.getPrefTown(MeteoAdapter.this.getItem(getAdapterPosition()));
         return true;
     }
 
         @Override
-        public void onClick(View v) {
+        public void onClick(View view) {
             service.submit(()->presenter.launchMap(MeteoAdapter.this.getItem(getAdapterPosition())));
         }
     }
